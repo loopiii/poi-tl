@@ -3,6 +3,12 @@ package com.deepoove.poi.tl.lt;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.data.*;
+import com.deepoove.poi.tl.lt.data.ComplexCellRenderData;
+import com.deepoove.poi.tl.lt.data.ComplexRowRenderData;
+import com.deepoove.poi.tl.lt.data.ComplexTableRenderData;
+import com.deepoove.poi.tl.lt.data.PicRenderData;
+import com.deepoove.poi.tl.lt.policy.ComplexTableRenderPolicy;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,6 +38,40 @@ public class Ep {
         URL url = Thread.currentThread().getContextClassLoader().getResource("word.txt");
         File dummyFile = new File(Objects.requireNonNull(url).getFile());
         templatePath = new File(dummyFile.getParent() + "/lt").getPath() + "/";
+    }
+
+    @Test
+    public void testComplexTable() throws IOException {
+        ComplexCellRenderData<TextRenderData> cellRenderData = new ComplexCellRenderData<>();
+        cellRenderData.setRenderData(new TextRenderData("FFFFFF", "姓名"));
+        ComplexCellRenderData<TextRenderData> cellRenderData1 = new ComplexCellRenderData<>();
+        cellRenderData1.setRenderData(new TextRenderData("FFFFFF", "学历"));
+        ComplexCellRenderData<TextRenderData> cellRenderData2 = new ComplexCellRenderData<>();
+        cellRenderData2.setRenderData(new TextRenderData("FFFFFF", "照片"));
+        ComplexCellRenderData<TextRenderData> cellRenderData3 = new ComplexCellRenderData<>();
+        cellRenderData3.setRenderData(new TextRenderData("FFFFFF", "头像"));
+
+        ComplexRowRenderData header = ComplexRowRenderData.build(cellRenderData, cellRenderData1, cellRenderData2, cellRenderData3);
+
+        ComplexCellRenderData<TextRenderData> cellRenderData4 = new ComplexCellRenderData<>();
+        cellRenderData4.setRenderData(new TextRenderData("小李"));
+        ComplexCellRenderData<TextRenderData> cellRenderData11 = new ComplexCellRenderData<>();
+        cellRenderData11.setRenderData(new TextRenderData("本科"));
+        ComplexCellRenderData<PicRenderData> cellRenderData21 = new ComplexCellRenderData<>();
+        cellRenderData21.setRenderData(new PicRenderData(200, 320, new FileInputStream(templatePath + "2.png"), XWPFDocument.PICTURE_TYPE_PNG, "x.png"));
+        ComplexCellRenderData<PicRenderData> cellRenderData31 = new ComplexCellRenderData<>();
+        cellRenderData31.setRenderData(new PicRenderData(200, 320, new FileInputStream("/Users/lan/Desktop/3.png"), XWPFDocument.PICTURE_TYPE_PNG, "x.png"));
+
+        ComplexRowRenderData rowRenderData = ComplexRowRenderData.build(cellRenderData4, cellRenderData11, cellRenderData21, cellRenderData31);
+
+        data.put("detail_table", new ComplexTableRenderData(header, Arrays.asList(header, rowRenderData, rowRenderData)));
+        Configure configure = Configure.newBuilder().customPolicy("detail_table", new ComplexTableRenderPolicy()).build();
+        XWPFTemplate template = XWPFTemplate.compile(templatePath + "4.docx", configure).render(data);
+        FileOutputStream out = new FileOutputStream(outPath);
+        template.write(out);
+        out.flush();
+        out.close();
+        template.close();
     }
 
     /**
