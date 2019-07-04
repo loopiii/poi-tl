@@ -31,7 +31,7 @@ public class Issues215 {
         };
 
         Configure config = Configure.newBuilder().supportNullToBlank(false).build();
-        XWPFTemplate template = XWPFTemplate.compile("src/test/resources/template.docx", config)
+        XWPFTemplate template = XWPFTemplate.compile("src/test/resources/template1.docx", config)
                 .render(datas);
 
         template.writeToFile("out_template_supportnulltoblank.docx");
